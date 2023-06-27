@@ -1,0 +1,284 @@
+openapi: 3.1.0
+x-stoplight:
+  id: 16afteqjbo1dz
+info:
+  title: TODO List
+  version: '1.0'
+  summary: TODO ListのAPI仕様書
+  description: ''
+servers:
+  - url: 'http://localhost:3000'
+paths:
+  /api/users/register:
+    parameters: []
+    get:
+      summary: ユーザ登録
+      tags: []
+      responses:
+        '200':
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                Get User Alice Smith:
+                  value:
+                    id: 142
+                    firstName: Alice
+                    lastName: Smith
+                    email: alice.smith@gmail.com
+                    dateOfBirth: '1997-10-31'
+                    emailVerified: true
+                    signUpDate: '2019-08-24'
+        '404':
+          description: User Not Found
+      operationId: get-users-userId
+      description: |-
+        ユーザ登録
+
+        クエリパラメータのtokenとEmail確認テーブルのtokenが一致していた場合usersテーブルのemail_verifiedをtrueに変更
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: token
+          description: メール認証用のtoken
+    post:
+      summary: ユーザ仮登録
+      operationId: post-api-users-register
+      responses:
+        '200':
+          description: OK
+      description: ユーザ仮登録
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  x-stoplight:
+                    id: f4g6tybta4c3i
+                  description: メールアドレス
+                password:
+                  type: string
+                  x-stoplight:
+                    id: yvbwmkn1asijh
+                  description: パスワード
+                username:
+                  type: string
+                  x-stoplight:
+                    id: bod0p5y3t2fzo
+                  description: ユーザ名
+              required:
+                - email
+                - password
+        description: ユーザ登録に必要な情報
+  /api/users/login:
+    post:
+      summary: ログイン
+      operationId: post-user
+      responses:
+        '200':
+          description: User Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                New User Bob Fellow:
+                  value:
+                    id: 12
+                    firstName: Bob
+                    lastName: Fellow
+                    email: bob.fellow@gmail.com
+                    dateOfBirth: '1996-08-24'
+                    emailVerified: false
+                    createDate: '2020-11-18'
+        '400':
+          description: Missing Required Information
+        '409':
+          description: Email Already Taken
+        '':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    x-stoplight:
+                      id: ebe0gnw6ba7ir
+                    properties:
+                      token:
+                        type: string
+                        x-stoplight:
+                          id: de2gbrzxfey6v
+                        description: 認証用token
+                    required:
+                      - token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: ログインメールアドレス
+                password:
+                  type: string
+                  x-stoplight:
+                    id: i8i4azd0snor2
+                  description: ログインパスワード
+              required:
+                - email
+                - password
+            examples:
+              Example 1:
+                value:
+                  email: string
+                  password: string
+        description: ログインに必要な情報
+      description: ログイン
+    parameters: []
+  /api/tasks:
+    get:
+      summary: タスク一覧取得
+      tags: []
+      responses: {}
+      operationId: get-api-tasks
+      description: タスク一覧取得API
+      security:
+        - bearer token: []
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: Authorization
+          description: Bearer token設定
+        - schema:
+            type: string
+          in: query
+          name: category
+          description: カテゴリでのフィルタ
+        - schema:
+            type: string
+          in: query
+          name: status
+          description: ステータスでのフィルタ
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  x-stoplight:
+                    id: lm1uvgdzuv2bu
+                  properties:
+                    id:
+                      type: string
+                      x-stoplight:
+                        id: 1kp5gfhfmsnn0
+                    title:
+                      type: string
+                      x-stoplight:
+                        id: 3q5cswmrya990
+                    description:
+                      type: string
+                      x-stoplight:
+                        id: zxytddo5he0bo
+                    status_id:
+                      type: string
+                      x-stoplight:
+                        id: 18sn4siawmcel
+                    category_id:
+                      type: string
+                      x-stoplight:
+                        id: 9egnahcsitmn3
+                  required:
+                    - id
+                    - title
+                    - status_id
+                    - category_id
+components:
+  schemas:
+    User:
+      title: User
+      type: object
+      examples:
+        - id: 142
+          firstName: Alice
+          lastName: Smith
+          email: alice.smith@gmail.com
+          dateOfBirth: '1997-10-31'
+          emailVerified: true
+          signUpDate: '2019-08-24'
+      x-stoplight:
+        id: h6dyou3z1qxe1
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the given user.
+          x-stoplight:
+            id: ljuqf80dot2vc
+        email:
+          type: string
+          format: email
+          x-stoplight:
+            id: jbuk7vpa9cks9
+        username:
+          type: string
+          x-stoplight:
+            id: e88xvwvsauxrr
+        password:
+          type: string
+          x-stoplight:
+            id: 1nj31y0e1v2ik
+      required:
+        - id
+        - email
+    Task:
+      title: Task
+      x-stoplight:
+        id: h873zxlbbdmr3
+      type: object
+      properties:
+        id:
+          type: string
+          x-stoplight:
+            id: vn85upgtst7tf
+        title:
+          type: string
+          x-stoplight:
+            id: mciofybls2hwc
+        user_id:
+          type: string
+          x-stoplight:
+            id: l8umk7mek7if8
+        category_id:
+          type: string
+          x-stoplight:
+            id: 43zptcde1aaft
+        descriptionn:
+          type: string
+          x-stoplight:
+            id: 9a92qf5dwxtdd
+        status_id:
+          type: string
+          x-stoplight:
+            id: w2qclkrqli13v
+      required:
+        - id
+        - title
+        - user_id
+        - category_id
+        - status_id
+  securitySchemes:
+    bearer token:
+      type: http
+      scheme: bearer
